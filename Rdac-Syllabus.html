@@ -11,7 +11,7 @@
 
 <meta name="author" content="Ronnie Bailey-Steinitz" />
 
-<meta name="date" content="2025-09-12" />
+<meta name="date" content="2025-09-15" />
 
 <title>R Data Course - Syllabus</title>
 
@@ -352,100 +352,112 @@ display: none;
 
 <h1 class="title toc-ignore">R Data Course - Syllabus</h1>
 <h4 class="author">Ronnie Bailey-Steinitz</h4>
-<h4 class="date">2025-09-12</h4>
+<h4 class="date">2025-09-15</h4>
 
 </div>
 
 
-<div id="week-intro-to-data-analysis-visualization-in-r-rwanda-cohort" class="section level1">
-<h1>9-Week Intro to Data Analysis &amp; Visualization in R (Rwanda
-Cohort)</h1>
-<div id="pre-course-workshop-led-by-laban-welcome-to-r-dive-into-data" class="section level2">
-<h2>Pre-Course Workshop (Led by Laban): Welcome to R – Dive into
-Data</h2>
-<p>Goal: Set up, open RStudio, load a dataset, and start exploring. -
-Install R, RStudio, and packages - RStudio environment: console, script,
-environment, project - Import CSV with readr::read_csv() - Explore with:
-glimpse(), summary(), head(), tail(), nrow() - Basic functions: mean(),
-median(), sd(), range(), length() - Simple plot: ggplot() +
-geom_histogram() or geom_point() - <strong>Homework:</strong> Explore
-your own dataset; apply 3 functions and create 1 plot</p>
+<div id="week-intro-to-data-analysis-visualization-in-r" class="section level1">
+<h1>9-Week Intro to Data Analysis &amp; Visualization in R</h1>
+<div id="pre-course-workshop-led-by-laban-welcome-to-r-dive-into-data" class="section level3">
+<h3>Pre-Course Workshop (Led by Laban): Welcome to R – Dive into
+Data</h3>
+<p>Goal: Set up, open RStudio, load a dataset, and start
+exploring.<br />
+- Install R, RStudio, and packages<br />
+- RStudio environment: console, script, environment, project<br />
+- Import CSV with <code>readr::read_csv()</code><br />
+- Explore with: <code>glimpse()</code>, <code>summary()</code>,
+<code>head()</code>, <code>tail()</code>, <code>nrow()</code><br />
+- Basic functions: <code>mean()</code>, <code>median()</code>,
+<code>sd()</code>, <code>range()</code>, <code>length()</code><br />
+- <strong>Homework:</strong> Explore your own dataset; apply 3 functions
+and get summary statistics</p>
 <hr />
 </div>
-<div id="week-1-is-my-data-clean-exploring-diagnosing-and-visualizing-problems" class="section level2">
-<h2>Week 1: Is My Data Clean? Exploring, Diagnosing, and Visualizing
-Problems</h2>
-<p><strong>Dataset:</strong> palmerpenguins (raw)<br />
+<div id="week-1-is-my-data-clean-exploring-diagnosing-and-visualizing-problems" class="section level3">
+<h3>Week 1: Is My Data Clean? Exploring, Diagnosing, and Visualizing
+Problems</h3>
+<p><strong>Dataset:</strong> <code>palmerpenguins</code> (raw)<br />
 - Data types: numeric, character, logical, factor<br />
-- Convert types: as.factor(), as.numeric()<br />
-- NA handling: is.na(), sum(is.na())<br />
-- Column checks: class(), str(), dplyr::count()<br />
+- Convert types: <code>as.factor()</code>,
+<code>as.numeric()</code><br />
+- NA handling: <code>is.na()</code>, <code>sum(is.na())</code><br />
+- Column checks: <code>class()</code>, <code>str()</code>,
+<code>dplyr::count()</code><br />
 - <strong>Visualization:</strong> bar plots, histograms<br />
 - <strong>Lab Challenge:</strong> Check for NAs, misclassified types,
 and plot 2 variables</p>
 </div>
-<div id="week-2-wrangling-basics-select-filter-mutate" class="section level2">
-<h2>Week 2: Wrangling Basics – Select, Filter, Mutate</h2>
-<p><strong>Dataset:</strong> palmerpenguins (raw) or
-ratdat::rat_growth<br />
-- Core verbs: select(), filter(), mutate()<br />
-- Logical comparisons, case_when() recoding<br />
-- Pipes: %&gt;%<br />
+<div id="week-2-wrangling-basics-select-filter-mutate" class="section level3">
+<h3>Week 2: Wrangling Basics – Select, Filter, Mutate</h3>
+<p><strong>Dataset:</strong> <code>palmerpenguins</code> (raw) or
+<code>ratdat::rat_growth</code><br />
+- Core verbs: <code>select()</code>, <code>filter()</code>,
+<code>mutate()</code><br />
+- Logical comparisons, <code>case_when()</code> recoding<br />
+- Pipes: <code>%&gt;%</code><br />
 - <strong>Visualization:</strong> histograms or bar plots of filtered
 subsets<br />
 - <strong>Lab Challenge:</strong> Create a new variable, subset, and
 plot from filtered data</p>
 </div>
-<div id="week-3-grouping-summarizing-and-custom-visuals" class="section level2">
-<h2>Week 3: Grouping, Summarizing, and Custom Visuals</h2>
-<p><strong>Dataset:</strong> gapminder<br />
-- group_by() + summarise(), arrange()<br />
+<div id="week-3-grouping-summarizing-and-custom-visuals" class="section level3">
+<h3>Week 3: Grouping, Summarizing, and Custom Visuals</h3>
+<p><strong>Dataset:</strong> <code>gapminder</code> (demographic)<br />
+- <code>group_by()</code> + <code>summarise()</code>,
+<code>arrange()</code><br />
 - Aggregation logic (means, counts)<br />
-- <strong>Visualization:</strong> geom_col(), geom_boxplot()<br />
+- <strong>Visualization:</strong> <code>geom_col()</code>,
+<code>geom_boxplot()</code><br />
 - <strong>Lab Challenge:</strong> Summarize data by group, visualize
 differences</p>
 </div>
-<div id="week-4-joining-and-reshaping" class="section level2">
-<h2>Week 4: Joining and Reshaping</h2>
-<p><strong>Dataset:</strong> split penguins or student project
-tables<br />
-- Joins: left_join(), inner_join()<br />
-- Binds: bind_rows(), bind_cols()<br />
-- Reshape: pivot_longer(), pivot_wider()<br />
+<div id="week-4-joining-and-reshaping" class="section level3">
+<h3>Week 4: Joining and Reshaping</h3>
+<p><strong>Dataset:</strong> TBD<br />
+- Joins: <code>left_join()</code>, <code>inner_join()</code><br />
+- Binds: <code>bind_rows()</code>, <code>bind_cols()</code><br />
+- Reshape: <code>pivot_longer()</code>, <code>pivot_wider()</code><br />
+- Other: <code>revalue()</code> (for incorrect join var inputs)<br />
+- Spatial data???<br />
 - <strong>Visualization:</strong> faceted plots for reshaped data<br />
 - <strong>Lab Challenge:</strong> Join and reshape your data, then
 visualize</p>
 </div>
-<div id="week-5-distributions-skew-and-data-transformations" class="section level2">
-<h2>Week 5: Distributions, Skew, and Data Transformations</h2>
-<p><strong>Dataset:</strong> ratdat::rat_diet<br />
+<div id="week-5-distributions-skew-and-data-transformations" class="section level3">
+<h3>Week 5: Distributions, Skew, and Data Transformations</h3>
+<p><strong>Dataset:</strong> TBD<br />
 - Distribution types: normal vs. skewed<br />
-- Transform: log(), sqrt(), z-scores<br />
-- <strong>Visualization:</strong> geom_histogram(), geom_density(),
-facet_wrap()<br />
+- Transform: <code>log()</code>, <code>sqrt()</code>, z-scores<br />
+- <strong>Visualization:</strong> <code>geom_histogram()</code>,
+<code>geom_density()</code>, <code>facet_wrap()</code><br />
 - <strong>Lab Challenge:</strong> Transform and plot skewed variable
 (before and after)</p>
 </div>
-<div id="week-6-relationships-regression-and-correlation" class="section level2">
-<h2>Week 6: Relationships – Regression and Correlation</h2>
-<p><strong>Dataset:</strong> penguins or gapminder<br />
-- Scatterplot with geom_point() + geom_smooth(method = “lm”)<br />
-- Fit linear models: lm(), summary(), cor()<br />
+<div id="week-6-relationships-regression-and-correlation" class="section level3">
+<h3>Week 6: Relationships – Regression and Correlation</h3>
+<p><strong>Dataset:</strong> TBD<br />
+- Scatterplot with <code>geom_point()</code> +
+<code>geom_smooth(method = &quot;lm&quot;)</code><br />
+- Fit linear models: <code>lm()</code>, <code>summary()</code>,
+<code>cor()</code><br />
 - <strong>Visualization:</strong> trend lines, colored groups<br />
 - <strong>Lab Challenge:</strong> Fit + plot a model, interpret slope
 and R²</p>
 </div>
-<div id="week-7-comparing-groups-boxplots-statistical-tests" class="section level2">
-<h2>Week 7: Comparing Groups – Boxplots &amp; Statistical Tests</h2>
-<p><strong>Dataset:</strong> penguins or rat_diet<br />
-- Categorical comparisons: t.test(), wilcox.test(), aov()<br />
+<div id="week-7-comparing-groups-boxplots-statistical-tests" class="section level3">
+<h3>Week 7: Comparing Groups – Boxplots &amp; Statistical Tests</h3>
+<p><strong>Dataset:</strong> TBD<br />
+- Categorical comparisons: <code>t.test()</code>,
+<code>wilcox.test()</code>, <code>aov()</code><br />
 - Assumptions: normality, variance<br />
 - <strong>Visualization:</strong> boxplots, violin plots<br />
 - <strong>Lab Challenge:</strong> Compare groups with a test and
 visualize results</p>
 </div>
-<div id="week-8-project-lab-build-your-analysis" class="section level2">
-<h2>Week 8: Project Lab – Build Your Analysis</h2>
+<div id="week-8-project-lab-build-your-analysis" class="section level3">
+<h3>Week 8: Project Lab – Build Your Analysis</h3>
 <ul>
 <li>Full RMarkdown pipeline: import → wrangle → summarize → visualize →
 interpret<br />
@@ -455,8 +467,8 @@ interpret<br />
 <li>Focus on reproducibility and clarity</li>
 </ul>
 </div>
-<div id="week-9-final-project-showcase" class="section level2">
-<h2>Week 9: <strong>Final Project Showcase</strong></h2>
+<div id="week-9-final-project-showcase" class="section level3">
+<h3>Week 9: <strong>Final Project Showcase</strong></h3>
 <ul>
 <li>Each student gives 5-minute presentation<br />
 </li>
