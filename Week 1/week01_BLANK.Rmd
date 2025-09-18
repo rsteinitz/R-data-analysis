@@ -1,0 +1,163 @@
+---
+title: "Week 1: Is My Data Clean? Exploring, Diagnosing, and Visualizing Problems"
+author: "Ronnie Steinitz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+  markdown: 
+    wrap: 200
+---
+
+We will be working using R Markdown files to save our code or script. An R Markdown file (saved as **'filename.Rmd'**) is a special type of document that lets you combine your R code, results (like tables and plots), and your written explanations all in one place.  
+
+It’s especially useful because it creates a clear, reproducible record of your analysis that you (or others) can easily follow and re-run later. Unlike plain code files, R Markdown helps you communicate your
+work like a report, not just as raw code.  
+
+An Rmd consists of intermingled information narratives and code.  
+
+
+# Skills Learning -- Lecture
+## 0. Rmarkdown structure - code chunk
+
+```{r}
+
+x <- 5  # radius of a circle
+
+```
+
+> Useful commands:
+- To "comment out" (make text grey and not run the code): Ctrl + Shift + C  
+- To create a new code chunk: Ctrl + Alt + i  
+
+Alright, let's get started.   
+
+## Load Required Packages
+
+```{r, message=FALSE, warning=FALSE}
+
+# install.package("tidyverse")
+# install.package("janitor")
+
+# Load tidyverse for data wrangling and visualization
+
+
+```
+
+
+## 1. Load and Preview the Dataset
+
+```{r}
+
+# check that you are in the correct working directory, the R-Ecology_Workshop folder
+# If not, set your working directory to the correct folder (e.g., R-Ecology-Workshop), where all of your scripts and data will be saved. For example: 
+# setwd("/Users/rsteinitz/Documents/github/R Data Analysis Course")
+
+
+# Load dataset
+
+
+
+```
+
+
+## 2. Diagnosing Data Types and Structure
+> Remember, to create a new code chunk: Ctrl + Alt + i  
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------
+
+# Skills Application -- Lab 
+## 6. Practice Prompts 
+
+Each student should now begin a **new R Markdown file** in the same project and try the following with either their own dataset or a provided one:
+
+If you are working on **your own dataset**, then create a Markdown file which you will be using continuously and adding to each week. 
+- Name it: *Lastname_Firstname_Data*  
+
+If you are working on an **example dataset**, then create a Markdown file just for this week.
+- Name it: *Lastname_Firstname_Week1*  
+
+Then, begin the lab activity:
+0. Import the dataset into the environment and save as an object. 
+
+1.  Identify which variables have missing values.  
+
+2.  Check for misclassified columns (e.g., text stored as factors, numbers stores as text).
+
+3.  Convert at least one column to the correct type.  
+
+4.  Get summary statistics for two variables of different classes.  
+
+5.  Create one bar plot (categorical variable) and one histogram (numeric variable).  
+
+6.  Add a title and axis labels to each plot.  
+
+7.  Knit the script into an HTML file, which will be saved to your working directory
+
+
+
+------------------------------------------------------------------------
+
+## Summary
+
+This week we:  
+- Loaded and explored a new dataset   
+- Investigated data types and missing values   
+- Visualized numeric and categorical variables  
+- knitted code into coding documentation  
+
+Next week, we’ll start wrangling our data using `filter()`, `select()`, and `mutate()` from `dplyr`.   
+
+
+# Optional - additional functions
+To explore on your own time, ahead of next week
+```{r}
+
+# See which individual records have the most missing data.
+# Number of missing values per row
+data %>%
+  mutate(row_missing = rowSums(is.na(.))) %>%
+  arrange(desc(row_missing)) %>%
+  head()
+
+# Find out whether certain groups (e.g., sexes or species) are more likely to have missing values.
+# Compare missing values in body mass across species
+data %>%
+  group_by(species) %>%
+  summarise(missing_body_mass = sum(is.na(body_mass_g)))
+
+# Customize colors in a bar plot using scale_fill_manual().
+ggplot(data, aes(x = species, fill = species)) +
+  geom_bar() +
+  scale_fill_manual(values = c("darkgreen", "darkorange", "steelblue")) +
+  labs(title = "Species Counts (Colored)", x = "Species", y = "Count")
+
+# Use facet_wrap() to compare distributions across groups.
+ggplot(data, aes(x = flipper_length_mm)) +
+  geom_histogram(binwidth = 2, fill = "lightblue", color = "black") +
+  facet_wrap(~ species) +
+  labs(title = "Flipper Length by Species", x = "Flipper Length (mm)", y = "Count")
+
+# Look at how many penguins exist per island and species.
+# desc() dictates the *descending* order
+data %>%
+  count(island, species) %>%
+  arrange(desc(n))
+
+```
+
+------------------------------------------------------------------------
+
+![Palmer
+Penguins!](https://education.rstudio.com/blog/2020/07/palmerpenguins-cran/gorman-penguins.jpg)
+
+![Palmer
+Map](https://education.rstudio.com/blog/2020/07/palmerpenguins-cran/antarctica-map.png)
+
+

@@ -1,26 +1,26 @@
 ---
-title: "Week 1: Is My Data Clean? Exploring, Diagnosing, and Visualizing Problems"
+title: 'Week 1: Is My Data Clean? Exploring, Diagnosing, and Visualizing Problems'
 author: "Ronnie Steinitz"
-output: html_document
-editor_options: 
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
   chunk_output_type: console
-  markdown: 
-    wrap: 72
+  markdown:
+    wrap: 200
 ---
 
-```{r, echo=F, comment=F, warning=F}
-options(width = 300) # Or a sufficiently large number
-```
+# Skills Learning -- Lecture
 
-We will be working using R Markdown files to save our code or script. An R Markdown file ( saved as 'filename.Rmd') is a special type of document that lets you combine your R code, results (like tables and plots), and your written explanations all in one place.  
+We will be working using R Markdown files to save our code or script. An R Markdown file (saved as **'filename.Rmd'**) is a special type of document that lets you combine your R code, results (like tables and plots), and your written explanations all in one place.  
 
 It’s especially useful because it creates a clear, reproducible record of your analysis that you (or others) can easily follow and re-run later. Unlike plain code files, R Markdown helps you communicate your
 work like a report, not just as raw code.  
 
 An Rmd consists of intermingled prose (narratives) and code. There are two types of code in an Rmd document: code chunks and inline R code:  
 
-# Skills Learning -- Lecture
-## 0. Rmarkdown demo - code chunk
+## Rmarkdown structure - code chunk
 
 ```{r}
 
@@ -28,17 +28,30 @@ x <- 5  # radius of a circle
 
 ```
 
-> Now, we can also include the code (or data created), in the body of the document. This is called *inline code*. The radius of the circle is **`r x`.**  
+Now, we can also include the code (or data created), in the body of the document. This is called *inline code*. The radius of the circle is **`r x`.**  
 
-> Useful commands:
-- To "comment out" (make text grey and not run the code): Ctrl + Shift + C
-- To create a new code chunk: Ctrl + Alt + i
-[For more shortcuts, you can follow this link!](https://bookdown.org/yihui/rmarkdown-cookbook/rstudio-shortcuts.html)
+> Useful commands:  
+- To "comment out" (make text grey and not run the code): Ctrl + Shift + C  
+- To create a new code chunk: Ctrl + Alt + i  
+[For more shortcuts, you can follow this link!](https://bookdown.org/yihui/rmarkdown-cookbook/rstudio-shortcuts.html)  
 
 \ 
 Alright, let's get started.   
 
-## Load Required Packages
+## 0. Load Required Packages
+
+> *Packages* are like apps; functions are like tools inside the app.\
+
+Packages in R are like apps you install on your computer.  
+Just like you install Microsoft Word to write documents or Excel to do spreadsheets, in R, you install packages to help you do specific types of tasks — like making graphs (`ggplot2`), cleaning messy data (`janitor`), or analyzing statistics (`stats`).  \
+
+Functions are the tools inside those apps.  
+For example, in Microsoft Word, once installed, you can use tools like bold, spellcheck, or insert image.
+In an R package like ggplot2, you get tools (functions) like geom_point() to make scatterplots or labs() to add axis labels.\
+
+Example: Think of `tidyverse` as the R version of Microsoft Office: it’s a suite of tools (packages like `dplyr`, `ggplot2`, `readr`, etc.).  
+
+Each package comes with specialized functions — like `filter()` from `dplyr` to filter rows, or `read_csv()` from `readr` to import data.  
 
 ```{r, message=FALSE, warning=FALSE}
 
@@ -50,19 +63,31 @@ library(tidyverse)
 
 ```
 
-In this course, we will use the `penguins` dataset from the `palmerpenguins` package. These data contain physical measurements, species info, and other metadata on three penguin species in Antarctica.  
+In this course, we will use the `penguins` dataset from the `palmerpenguins` package, which is an innate dataset that comes with R. These data contain physical measurements, species info, and other metadata on three penguin species in Antarctica.  
 
-We will use the RAW penguin data, which includes errors, miscategorizations, and missing data. The idea is that is mimics the type of data you might work with in your research.  
+The `penguins` data included in R is fairly clean. We will use the `penguins_raw` data, which includes errors, miscategorizations, and missing data. The idea is that it mimics the type of data you might work with in your research.  
+
+Although you can download it directly from R, we will practice importing the *.csv* file from your working directory.
 
 ## 1. Load and Preview the Dataset
 
 ```{r}
 
+# check that you are in the correct working directory, the R-Ecology_Workshop folder
+getwd()
+
+# If not, set your working directory to the correct folder (e.g., R-Ecology-Workshop), where all of your scripts and data will be saved. For example: 
+# setwd("/Users/rsteinitz/Documents/github/R Data Analysis Course")
+
 # Load dataset
 data_raw <- read_csv("Week 1/Palmer Penguins Raw.csv")
 
 # Preview the structure
-glimpse(data_raw)
+glimpse(data_raw, width = 80) # the 'width' command just limits how much is printed in each line of information. It is mostly helpful when you 'knit' the document to take up less space on the document. 
+
+# glimpse() is a cleaner display that str(), but does the same
+str(data_raw)
+
 # notice the number of rows
 # the number of columns
 # and then the column names and type of data in each (which is determined when R reads in the dataset)
@@ -71,8 +96,7 @@ glimpse(data_raw)
 head(data_raw)
 
 # Open the data in a new window
-View(data_raw)
-
+#View(data_raw)
 
 # Let's clean up the column names, which will make it easier to index, or refer to them in functions
 data <- janitor::clean_names(data_raw)
@@ -88,6 +112,20 @@ names(data_raw)
 
 ```
 
+> To run a **single** line of code: Ctrl + Enter. Runs the line of code your courses is on. *Give it a try!*  
+
+> `janitor::clean_names()` is a great tool to standardize column names  
+
+...which makes column names easier to use in code. Instead of having to type something like:  
+`data$"Flipper Length (mm)"`   
+...a "cleaned" version of this name would be:  
+`data$flipper_length_mm`  \
+
+- The function `clean_names()` automatically replaces spaces, parentheses, slashes, and symbols with clean underscores. For example, `"Body Mass (g)"` becomes `body_mass_g` — easier to read, write, and autocomplete.  
+
+- Helps avoid bugs! You don’t have to remember to use quotation marks around column names or worry about weird symbols breaking your code.  
+
+
 ## 2. Diagnosing Data Types and Structure
 
 We want to understand what type of variables we’re working with:  
@@ -95,27 +133,29 @@ We want to understand what type of variables we’re working with:
 - Are some columns misclassified?
 
 ```{r}
-# Check types: 
-glimpse(data)
 
-# what type of data exists in a particular column
+# Check data types: 
+glimpse(data, width = 80)
+
+# if you want to know what type of data exists in a particular column, you can target it directly:
 class(data$island) # character
-class(data$date_egg) # character
+class(data$date_egg) # character, not date! 
 class(data$flipper_length_mm) # numeric (also labeled as "double")
 
+# how many entries (rows) per each category in this variable
+table(data$species)
 
 # Information within a column
 unique(data$island) # we see that there are 3 unique values that exist in this column
-unique(data$date_egg) # 50 unique dates... 
 unique(data$flipper_length_mm) # many!!! how do we know how many?
 length(unique(data$flipper_length_mm))
-
 
 # ok, back to the Islands!
 unique(data$island) # Torgersen, Biscoe, Dream
 
 # I want to know how many rows of data exist for each 
 count(data, island) # count the number of rows for each unique entry in column "island"
+
 # ================================================================================
 # Q: so what does 'Biscoe - 168' tell us about the data??
 # A: ---> that there are 168 rows of data (out of 344) that were collected on Biscoe Island.
@@ -146,7 +186,7 @@ is.na(data$sex)
 # How many NAs per column?
 colSums(is.na(data)) # summarizes a statistic across all columns
 
-# this is also an option per specific column
+# this is also an option per a specific column
 sum(is.na(data$flipper_length_mm))
 
 # ================================================================================
@@ -192,8 +232,8 @@ Some variables might be stored as character but should actually be treated as **
 
 When do we keep them as characters? We keep variables as character when they are text labels or descriptions that are not meant to be grouped or modeled — for example, a column of penguin ID codes or free-text comments, like notes.  
 
+### 4.1 Check class
 Let’s check the "sex" column and convert it to a factor if needed:
-
 ```{r}
 
 # What type of data is stored in the "sex" column?
@@ -238,16 +278,17 @@ hist(data$flipper_length_mm)
 
 ```
 
-Instead, I prefer to use ggplots ('GG' stands for Grammar of Graphics).  
+Instead, I prefer to use `ggplot` ('GG' stands for Grammar of Graphics).  
 And it is a mini-language within R that we use to create quick, polished, and publication-ready graphs.  
 
 There are a lot of different things you can do with ggplots, and we'll see many examples of these in the coming weeks.  
 
-Every ggplot has three core components:
-- **Data** – the dataset being visualized
-- **Aesthetics** (aes) – mappings that connect variables to visual properties (like x, y, color)
-- **Geometries** (geoms) – the type of plot you want to make (like geom_point() or geom_bar()).
+Every `ggplot` has three core components:  
+- **Data** – the dataset being visualized  
+- **Aesthetics** (`aes`) – mappings that connect variables to visual properties (like x-axis, y-axis, color)  
+- **Geometries** (`geom_`) – the type of plot you want to make (like `geom_point()` or `geom_bar()`).  
 
+### 5.2 Histogram with ggplot
 So let's build our first ggplot:
 ``` {r} 
 
@@ -269,7 +310,7 @@ ggplot(data, aes(x = flipper_length_mm)) +
 
 \ 
 
-### 5.2 Bar Plot of a Categorical Variable
+### 5.3 Bar Plot of a Categorical Variable
 
 ```{r}
 ggplot(data, aes(x = species)) +
@@ -289,7 +330,7 @@ ggplot(data, aes(x = species, fill = sex)) +
 
 ```
 
-> 💡 **Note:** These are *exploratory* plots. We’re not yet testing hypotheses—just getting familiar with our data’s structure and quirks.
+> **Note:** These are *exploratory* plots. We’re not yet testing hypotheses—just getting familiar with our data’s structure and quirks.
 
 
 
@@ -327,18 +368,17 @@ Then, begin the lab activity:
 
 ## Summary
 
-This week we: 
-- Loaded and explored a new dataset 
-- Investigated data types and missing values 
-- Visualized numeric and categorical variables
-- knitted code into coding documentation
+This week we:  
+- Loaded and explored a new dataset  
+- Investigated data types and missing values   
+- Visualized numeric and categorical variables  
+- knitted code into coding documentation  
 
-Next week, we’ll start wrangling our data using `filter()`, `select()`,
-and `mutate()` from `dplyr`.  
+Next week, we’ll start wrangling our data using `filter()`, `select()`, and `mutate()` from `dplyr`.   
 
 
-## Optional - additional functions
-
+# Optional - additional functions
+To explore on your own time, ahead of next week
 ```{r}
 
 # See which individual records have the most missing data.
@@ -376,10 +416,8 @@ data %>%
 
 ------------------------------------------------------------------------
 
-![Palmer
-Penguins!](https://education.rstudio.com/blog/2020/07/palmerpenguins-cran/gorman-penguins.jpg)
+![](gorman-penguins.jpg)
 
-![Palmer
-Map](https://education.rstudio.com/blog/2020/07/palmerpenguins-cran/antarctica-map.png)
+![](antarctica-map.png)
 
 
