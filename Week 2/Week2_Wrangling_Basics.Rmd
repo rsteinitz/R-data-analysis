@@ -3,6 +3,8 @@ title: 'Week 2: Wrangling Basics – Select, Filter, Mutate'
 author: "Ronnie Steinitz"
 date: "`r Sys.Date()`"
 output:
+  pdf_document: default
+  html_document: default
 editor_options:
   chunk_output_type: console
   markdown:
@@ -35,9 +37,18 @@ library(here)
 
 ## 1. Load Data
 Use the same dataset we saved last week, in folder Week 1
+
+We are using a function called `here()`.
+`here::here()` finds files based on the root of your R Project instead of wherever your .Rmd happens to live. This makes your code more reliable and portable — you can knit from any subfolder and still load data with the same path.
+
+Think of your R Project as your “home address.” If you use `here::here()`, you’re saying “start from my house, then go to Week 1, then open this file.”
+
+Without it, R might start from whatever room you happen to be standing in (the folder where your script lives), and then it gets confused if the file isn’t there.
+
+So `here::here()` always starts from the same “home base,” (your working directory) which keeps paths consistent when knitting or sharing code.
 ```{r}
 
-data_raw <- read_csv(here("Week 1", "Palmer Penguins Raw.csv"))
+data_raw <- read_csv(here("Week 1/Palmer Penguins Raw.csv"))
 
 ```
 
@@ -65,7 +76,7 @@ Read `%>%` as **“and then”**
 > Shortcut for pipes: Ctrl + Shift + M\ 
 
 
-## 3. Select() – Choosing Columns  
+## 3. Select( ) – Choosing Columns  
 
 Sometimes we don’t want all the variables.  
 For example, what if we only care about **species, island, and flipper_length_mm**?  
@@ -100,7 +111,7 @@ So now we know how to `select()` which columns we would like to focus on.
 But what if we want exclude certain observations? For example, limiting to only a particular year or study group?  
 
 
-## 4. Filter() – Choosing Rows  
+## 4. Filter( ) – Choosing Rows  
 Let's see how we can only target rows from Dream island
 ```{r}
 
@@ -168,7 +179,7 @@ test2 <- data_raw %>%
 
 
 
-## 5. Mutate() – Changing Variables  
+## 5. Mutate( ) – Changing Variables  
 
 Let’s create a new column for **body mass in kilograms**:  
 ### 5.1 Create new variable
@@ -206,6 +217,12 @@ ggplot(data %>% filter(body_mass_g > 4500),
   #geom_histogram(fill = "orange", color = "firebrick") +
   geom_histogram(aes(fill = sex)) +
   labs(title = "Penguins with Body Mass > 4500 g", x = "Body Mass (g)")
+
+ggplot(data %>% filter(body_mass_g > 4500 | body_mass_g < 3500), 
+  aes(x = body_mass_g)) + # can also add 'filter !is.na(sex)
+  #geom_histogram(fill = "orange", color = "firebrick") +
+  geom_histogram(aes(fill = sex)) +
+  labs(title = "Very Small and Very Large Penguins", x = "Body Mass (g)")
 
 ```
 
@@ -247,10 +264,10 @@ ggplot(data %>% filter(name_first == "Adelie" & !is.na(sex)),
 
 Each student should now begin a **new R Markdown file** in the same project and try the following with either their own dataset or a provided one:
 
-If you are working on **your own dataset**, then create a Markdown file to which you will be using and continuously adding. 
+If you are working on **your own dataset**, then create a Markdown file to which you will be using and continuously adding.  
 - Name it: *Lastname_Firstname_Data*  
 
-If you are working on a **example dataset**, then create a Markdown file just for this week.
+If you are working on a **example dataset**, then create a Markdown file just for this week.  
 - Name it: *Lastname_Firstname_Week2*  
 
 
