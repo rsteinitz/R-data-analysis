@@ -1,0 +1,296 @@
+---
+title: 'Week 2: Wrangling Basics – Select, Filter, Mutate'
+author: "Ronnie Steinitz"
+date: "`r Sys.Date()`"
+output:
+editor_options:
+  chunk_output_type: console
+  markdown:
+    wrap: 200
+---
+
+# Skills Learning -- Lecture  
+
+Last week, we explored the structure of our dataset, checked data types, and built some basic plots.  
+This week, we’ll begin *wrangling* data: learning how to **select**, **filter**, and **mutate** columns and rows using the `dplyr` package.  
+
+These are essential tools because:  
+- `select()` helps you *choose only the columns you need*  
+- `filter()` helps you *focus on specific rows of interest*  
+- `mutate()` helps you *add new variables or transform existing ones*  
+
+Together, they make it easy to organize your data into exactly what you need for analysis.  
+
+
+## 0. Load Required Packages  
+
+```{r, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(janitor)
+library(here)
+
+```
+
+
+## 1. Load Data
+Use the same dataset we saved last week, in folder Week 1
+```{r}
+
+data_raw <- read_csv(here("Week 1", "Palmer Penguins Raw.csv"))
+
+```
+
+
+## 2. Pipes    
+The **pipe** (`%>%`) lets us *chain together commands* so they read like a sentence.  
+It allows us to write our code in a sequence that flows from left to right, instead of nesting functions inside one another.
+
+```{r}
+
+# Instead of nesting:  
+data <- clean_names(data_raw) # Clean column names 
+
+# We can write:  
+data <- data_raw %>%
+  clean_names() # Clean column names using a pipe ("and then")
+
+# Quick look
+glimpse(data)
+
+```  
+
+Read `%>%` as **“and then”**
+
+> Shortcut for pipes: Ctrl + Shift + M\ 
+
+
+## 3. Select() – Choosing Columns  
+
+Sometimes we don’t want all the variables.  
+For example, what if we only care about **species, island, and flipper_length_mm**?  
+
+```{r}
+
+# let's see the dataset structure
+head(data)
+
+# we can't see all the columns, and we don't care about some of the columns...
+
+
+# So, we can do the same thing, but limiting only to specific columns
+data2 <- data %>%
+  dplyr::select(species, island, flipper_length_mm)
+
+# we made a new object here (a new dataset) copied from the old one, so that we are not over-writing 'data.' Dataset 'data' remains as is, and any manipulations I am doing are on a copy of it, with only selected columns. 
+
+view(data2) # only includes colums 'species,' 'island,' and 'flipper_length_mm')
+
+
+
+# We can also exclude columns using a `-` (minus) sign
+data3 <- data %>%
+  dplyr::select(-study_name, -comments)
+
+view(data3) # does not have columns 'study_name' and 'comments')
+
+```
+
+So now we know how to `select()` which columns we would like to focus on.  
+But what if we want exclude certain observations? For example, limiting to only a particular year or study group?  
+
+
+## 4. Filter() – Choosing Rows  
+Let's see how we can only target rows from Dream island
+```{r}
+
+data4 <- data %>%
+  dplyr::filter(island == "Dream") 
+
+# only 124 observations!
+
+
+# What about penguins with **flipper length greater than 200 mm**?  
+
+# ==============================================================
+# Q: How many observations of flipper_length_mm > 200? 
+# A: 148
+# ==============================================================
+
+data4 <- data %>%
+  dplyr::filter(flipper_length_mm > 200)
+
+# 148 observations
+
+```
+
+
+**Logical operators you can use in filter():**  
+- `==` equal to  
+- `!=` not equal to  
+- `>` greater than  
+- `<` less than  
+- `&` and  
+- `|` or  
+
+
+### Example - Select, Filter
+```{r}
+
+# If I give you a line of code like this:
+test1 <- arrange(select(filter(clean_names(data_raw), island == "Dream"), species, island, flipper_length_mm), flipper_length_mm)
+
+# can you tell me what it does??? 
+# IMPORTANT: the functions start from the inside and go outward! Find the most central parentheses and work outward from there. 
+
+
+# And, to write it, you would need to put lots of parentheses one inside the other which can lead to error:
+test1 <- clean_names(data_raw)
+test1 <- filter(clean_names(data_raw), island == "Dream")
+test1 <- select(filter(clean_names(data_raw), island == "Dream"), species, island, flipper_length_mm)
+test1 <- arrange(select(filter(clean_names(data_raw), island == "Dream"), species, island, flipper_length_mm), flipper_length_mm)
+
+# Nested functions (harder to read!)
+
+
+# You can just use a pipe and read it like a sentence:
+# Same thing, much clearer with a pipe
+test2 <- data_raw %>%
+  clean_names() %>%
+  dplyr::filter(island == "Dream") %>% 
+  dplyr::select(species, island, flipper_length_mm) %>% 
+  dplyr::arrange(flipper_length_mm)
+
+# functions start from top and move downward
+
+```
+
+
+
+
+## 5. Mutate() – Changing Variables  
+
+Let’s create a new column for **body mass in kilograms**:  
+### 5.1 Create new variable
+```{r}
+
+data2 <- data %>%
+  mutate(body_mass_kg = body_mass_g / 1000) %>%
+  select(species, body_mass_g, body_mass_kg)
+
+
+data <- data %>% 
+  mutate(name_first = word(species, 1),
+         name_second = word(species, 2))
+
+# notice that you are overwriting the previous "data" so you must be careful with that. If you mess up, you will want to re-load your data from the file (1. Load Data) and run the script again.
+
+```
+
+
+## 6. Visualizing Subsets  
+
+Now let’s practice combining wrangling with visualization.  
+
+### Histogram of Large Penguins Only  
+
+```{r}
+
+# let's see the distribution of measurements
+ggplot(data, aes(x = body_mass_g)) +
+  geom_histogram()
+
+# ok, let's limit it to only large-flippered penguins
+ggplot(data %>% filter(body_mass_g > 4500), 
+  aes(x = body_mass_g)) +
+  #geom_histogram(fill = "orange", color = "firebrick") +
+  geom_histogram(aes(fill = sex)) +
+  labs(title = "Penguins with Body Mass > 4500 g", x = "Body Mass (g)")
+
+```
+
+### Bar Plot by Island (Filtered to Adelie Only)  
+
+```{r}
+
+
+ggplot(data %>% filter(name_first == "Adelie"),
+       aes(x = island, fill = sex)) +
+  geom_bar() +
+  labs(title = "Adelie Penguins by Island")
+
+
+# what if we want to exclude NAs?
+ggplot(data %>% filter(name_first == "Adelie" & !is.na(sex)),
+       aes(x = island, fill = sex)) +
+  geom_bar() +
+  labs(title = "Adelie Penguins by Island")
+
+
+# FACET_WRAP!!!
+# FACET_WRAP!!!
+# FACET_WRAP!!!
+ggplot(data %>% filter(name_first == "Adelie" & !is.na(sex)),
+       aes(x = island, fill = sex)) +
+  geom_bar() +
+  labs(title = "Adelie Penguins by Island") +
+  facet_wrap(~study_name)
+
+
+```
+
+
+
+# Skills Application -- Lab  
+
+## 7. Practice Prompts  
+
+Each student should now begin a **new R Markdown file** in the same project and try the following with either their own dataset or a provided one:
+
+If you are working on **your own dataset**, then create a Markdown file to which you will be using and continuously adding. 
+- Name it: *Lastname_Firstname_Data*  
+
+If you are working on a **example dataset**, then create a Markdown file just for this week.
+- Name it: *Lastname_Firstname_Week2*  
+
+
+0. Create new markdown file. Load packages. Import the dataset into the environment and save as an object (e.g., `data`). 
+
+1.  Identify which variables have missing values.  
+
+2.  Check for misclassified columns (e.g., text stored as factors, numbers stores as text). Get summary statistics for two variables of different classes.  
+
+3.  Convert one column to the correct type.  
+
+4. Use `select()` to keep only 3 columns of your choice.  
+
+5. Use `filter()` to create a subset with one species of penguin.  
+
+6. Create a **new variable** using `mutate()` (for example, converting grams → kilograms, or categorize numeric values).  
+
+5. Make a histogram of a numeric variable from your subset. Add a title and axis labels to your plot.  
+
+7. Knit the script into an HTML file, which will be saved to your working directory.  
+
+
+
+
+# Optional – Look Ahead  
+
+Next week, we’ll go deeper into wrangling (grouped summaries, joins). If you want to try early:  
+
+```{r}
+# Try grouping and summarizing!
+data %>%
+  group_by(species) %>%
+  summarise(avg_mass = mean(body_mass_g, na.rm = TRUE))
+
+# Try arranging data (sorting)
+data %>%
+  arrange(desc(flipper_length_mm)) %>%
+  head()
+```
+
+
+This Week’s Takeaway:
+We learned to use **pipes**, **select**, **filter**, **mutate**, and **case_when** to wrangle datasets into the form we need.  
