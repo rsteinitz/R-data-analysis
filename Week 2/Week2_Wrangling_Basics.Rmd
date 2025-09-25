@@ -95,7 +95,8 @@ data2 <- data %>%
 
 # we made a new object here (a new dataset) copied from the old one, so that we are not over-writing 'data.' Dataset 'data' remains as is, and any manipulations I am doing are on a copy of it, with only selected columns. 
 
-view(data2) # only includes colums 'species,' 'island,' and 'flipper_length_mm')
+
+# View(data2) # only includes columns 'species,' 'island,' and 'flipper_length_mm')
 
 
 
@@ -103,7 +104,7 @@ view(data2) # only includes colums 'species,' 'island,' and 'flipper_length_mm')
 data3 <- data %>%
   dplyr::select(-study_name, -comments)
 
-view(data3) # does not have columns 'study_name' and 'comments')
+# View(data3) # does not have columns 'study_name' and 'comments')
 
 ```
 
@@ -132,6 +133,10 @@ data4 <- data %>%
   dplyr::filter(flipper_length_mm > 200)
 
 # 148 observations
+
+
+# you can also combine filter conditions:
+data5 <- data %>% filter(flipper_length_mm > 200, island == "Dream")
 
 ```
 
@@ -185,6 +190,7 @@ Let’s create a new column for **body mass in kilograms**:
 ### 5.1 Create new variable
 ```{r}
 
+
 data2 <- data %>%
   mutate(body_mass_kg = body_mass_g / 1000) %>%
   select(species, body_mass_g, body_mass_kg)
@@ -193,6 +199,10 @@ data2 <- data %>%
 data <- data %>% 
   mutate(name_first = word(species, 1),
          name_second = word(species, 2))
+
+
+data <- data %>% 
+  mutate(size_class = ifelse(flipper_length_mm>200, "Large", "Small"))
 
 # notice that you are overwriting the previous "data" so you must be careful with that. If you mess up, you will want to re-load your data from the file (1. Load Data) and run the script again.
 
