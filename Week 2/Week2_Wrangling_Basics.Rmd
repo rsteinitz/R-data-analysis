@@ -295,9 +295,9 @@ If you are working on a **example dataset**, then create a Markdown file just fo
 
 6. Create a **new variable** using `mutate()` (for example, converting grams → kilograms, or categorize numeric values).  
 
-5. Make a histogram of a numeric variable from your subset. Add a title and axis labels to your plot.  
+7. Make a histogram of a numeric variable from your subset. Add a title and axis labels to your plot.  
 
-7. Knit the script into an HTML file, which will be saved to your working directory.  
+8. Knit the script into an HTML file, which will be saved to your working directory.  
 
 
 
