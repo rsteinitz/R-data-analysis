@@ -1,0 +1,44 @@
+---
+title: "Week 3 Lab"
+author: "Ronnie Bailey-Steinitz"
+date: "2025-10-09"
+output: html_document
+---
+
+# Skills Application – Lab  
+
+> Create a **new R Markdown file** in your project > Week 3.  
+Name it: `Lastname_Firstname_Week3`.  
+
+> Follow the prompts below. For each plot, remember to include **labels**:  
+`labs(title = ..., x = ..., y = ...)`.  
+
+> Use the `Palmer Penguins` dataset (hint: you will need to call for it from another folder in your working directory).  
+  
+  
+
+### 1. Summarize
+- Use `group_by()` and `summarise()` to calculate an **average** of a numeric variable for each species or each island.  
+- Then use `arrange()` to order results from highest to lowest (hint: desc() is largest to smallest values).  
+
+
+### 2. Visualize Group Means
+- Make a bar plot (`geom_col()`) showing the **average** value for each species for the nurmeric variable you chose.   
+
+
+### 3. Boxplot Challenge
+- Create a boxplot comparing values across species. Pick any numeric variable and summarize it's mean, minimum, and maximum values across groups of observations (the groups can be species, island, sex, stage, date, study, and so on).  
+- Try filtering to only a particular year.  
+- Add axis labels and a title.  
+
+
+### 4. Your Choice
+- Pick *any numeric variable*.  
+- Summarize by any grouping variable (e.g., species, island, sex, stage).  
+- Make one visualization that best shows the differences. Think about which graph type to best convery what you are trying to show.  
+
+
+# This Week’s Takeaway
+- `group_by()` + `summarise()` create summary tables.  
+- Visualizations (bar, boxplot, line) can reveal group differences and changes over time.  
+- Next week: **joins** — combining datasets together.  
