@@ -1,0 +1,174 @@
+---
+title: "Week 3: Grouping, Summarizing, and Custom Visuals"
+author: "Ronnie Bailey-Steinitz"
+date: "2025-10-06"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Skills Learning – Lecture  
+
+This week we introduce only **two new functions** — `group_by()` and `summarise()` —  and then spend most of the time visualizing data.  
+
+We’ll use the **gapminder** dataset, which includes demographic and economic data by country and year.  
+
+## 0. Load Required Packages
+```{r}
+
+library(tidyverse)
+
+# install.packages("here") 
+library(here) # this package will help overcome issues with knitting and your working directory
+
+```
+
+## 1. Load Data
+```{r}
+
+data <- read_csv(here("Week 3/gapminder.csv")) %>% 
+  janitor::clean_names()
+
+glimpse(data)   # quick look at variables
+
+```
+
+## 2. Grouping and Summarizing
+### 2.1 group_by() + summarise()
+```{r}
+
+# We can get a summary statistic
+mean(data$life_exp) # quick and easy way
+data %>% summarize(mean(life_exp, na.rm = TRUE)) # within a pipe
+
+# We can also look at summarizing by group
+# Example: average life expectancy by continent
+data %>%
+  dplyr::group_by(continent) %>%
+  dplyr::summarise(mean_life_exp = mean(life_exp, na.rm = TRUE))
+
+# We can summarize after applying a filter and then a grouping command
+data1 <- data %>% 
+  filter(year == 2007) %>% 
+  dplyr::group_by(continent) %>%
+  dplyr::summarise(mean_life_exp = mean(life_exp, na.rm = TRUE),
+                   n_countries = n())
+
+write_csv(data1, "Mean Life Expectancy by Continent.csv")
+
+```
+
+### 2.2 Summarize and Arrange
+```{r}
+
+data1 <- data %>% 
+  filter(continent != "Asia") %>% 
+  group_by(country) %>%
+  summarise(max(pop))
+
+# We can also add the information to a new variable in the dataset
+data2 <- data %>% 
+  filter(continent != "Asia") %>% 
+  group_by(country) %>% 
+  summarize(max_pop = max(pop, na.rm = TRUE)) # summarize the maximum population size logged for this country
+# notice that data2 is automatically arranged by the name of the country
+
+data2 <- data %>% 
+  filter(continent != "Asia") %>% 
+  group_by(country) %>% 
+  summarize(max_pop = max(pop, na.rm = TRUE)) %>% 
+  arrange(max_pop) # <------------- ADD THIS ------------------
+# now, data2 is arranged by increasing maximum population size
+
+data %>%
+  dplyr::filter(country == "China") %>%
+  dplyr::summarise(mean_life_exp = mean(life_exp),
+                   mean_gdp_percap = mean(gdp_percap))
+
+```
+
+
+## 3. Visualizing Summaries
+### 3.1 Boxplots – geom_boxplot()
+```{r}
+# Show distribution of life expectancy by continent
+ggplot(data, aes(x = continent, y = life_exp, fill = continent)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Life Expectancy by Continent",
+       x = "Continent", y = "Life Expectancy (years)")
+
+```
+
+
+### 3.2 Line plot – geom_line()
+```{r}
+
+germany <- data %>% 
+   dplyr::filter(country == "Germany")
+
+ggplot(germany, aes(x = year, y = life_exp)) +
+  geom_line() +
+  labs(title = "Germany Life Expectancy (1952–2007)",
+       x = "Year")
+
+```
+
+
+### Summarize by continent, year
+```{r}
+
+data3 <- data %>% 
+  group_by(continent, year) %>% 
+  summarize(mean_life_exp = mean(life_exp, na.rm = TRUE))
+
+# View(data3)
+
+ggplot(data3, aes(x = year, y = mean_life_exp, color = continent)) +
+  geom_line() +
+  labs(title = "Life Expectancy by Continent (1952–2007)",
+       x = "Year", y = "Life Expectancy")
+
+```
+
+
+
+
+# Skills Application – Lab  
+
+Create a **new R Markdown file** in your project > Week 3.  
+Name it: `Lastname_Firstname_Week3`.  
+
+Follow the prompts below. For each plot, remember to include **labels**:  
+`labs(title = ..., x = ..., y = ...)`.  
+
+### 1. Summarize
+- Use `group_by()` and `summarise()` to calculate an **average** of a numeric variable for each individual or each group.  
+- Then use `arrange()` to order results from highest to lowest (hint: desc() is largest to smallest values).  
+
+
+### 2. Visualize Group Means
+- Make a bar plot (`geom_col()`) showing the **average** life expectancy for each group.  
+- Change the fill colors to something you like.  
+
+
+### 3. Boxplot Challenge
+- Create a boxplot comparing values across groups. Pick any numeric vairable and summarize it's mean across groups of observations (the groups can be social group, individual name, country, observer, and so on).  
+- Try filtering to only a particular year.  
+- Add axis labels and a title.  
+
+
+### 4. Histogram vs Density
+- Plot the distribution of life expectancy using both histogram and density.  
+- Which gives you more insight? Write a short note in your Markdown file.  
+
+
+### 5. Your Choice
+- Pick *any numeric variable*.  
+- Summarize by continent or year.  
+- Make one visualization that best shows the differences.  
+
+
+# This Week’s Takeaway
+- `group_by()` + `summarise()` create summary tables.  
+- Visualizations (bar, boxplot, line) can reveal group differences and changes over time.  
+- Next week: **joins** — combining datasets together.  
