@@ -1,13 +1,13 @@
-<h1 align="center">🇷🇼 R Data Analysis Course – Rwanda Cohort 2025</h1>
+<h1 align="center">R Data Analysis Course – Rwanda Cohort 2025</h1>
 
 <h2 align="center">Instructor: Dr. Ronnie Steinitz  
 <br>Dian Fossey Gorilla Fund</h2>
 
-<p align="center">📍 Ellen DeGeneres Campus · Sept–Nov 2025 · Weekly in-person sessions</p>
+<p align="center">📍 Ellen DeGeneres Campus · Aug–Nov 2025 · Weekly in-person sessions</p>
 
 ---
 
-### 📘 About the Course
+### About the Course
 
 This is an 8-week interactive course designed to build practical skills in **data cleaning**, **exploration**, and **visualization** using R.
 
@@ -22,16 +22,16 @@ Each student will target a particular research question. At the end, you will de
 
 ---
 
-### ⏰ First Class
+### Time and Location
 
-🗓 **Friday, September 19, 2025**  
-🕚 **11:00 AM**  
+🗓 **Every Friday**  
+🕚 **11:00 AM - 12:30 PM & 1:30 PM - 3:00 PM**  
 📍 Dian Fossey Gorilla Fund Computer Lab (Ellen Degeneres Campus)
 
-Please come energized and ready to learn! No new packages need to be installed — just have RStudio open and your project ready.
+Stay tuned for an email with instructions on data and packages to download in the days before each class.
 
 ---
 
-### 💬 Questions?
+### Questions?
 
 Reach out to Dr. Ronnie Steinitz via email or before/after class. I'm here to help you succeed!
