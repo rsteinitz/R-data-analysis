@@ -41,11 +41,12 @@ glimpse(data)   # quick look at variables
 mean(data$life_exp) # quick and easy way
 data %>% summarize(mean(life_exp, na.rm = TRUE)) # within a pipe
 
-# We can also look at summarizing by group
+### Q: Now what happens when we add group_by()? =====================
 # Example: average life expectancy by continent
 data %>%
   dplyr::group_by(continent) %>%
   dplyr::summarise(mean_life_exp = mean(life_exp, na.rm = TRUE))
+### A: We get the mean by group, in this case, continent =====================
 
 # We can summarize after applying a filter and then a grouping command
 data1 <- data %>% 
@@ -71,8 +72,9 @@ data2 <- data %>%
   filter(continent != "Asia") %>% 
   group_by(country) %>% 
   summarize(max_pop = max(pop, na.rm = TRUE)) # summarize the maximum population size logged for this country
-# notice that data2 is automatically arranged by the name of the country
+# notice that data2 is automatically arranged by the **name of the country**
 
+# you can change the arrangement to the **population**!
 data2 <- data %>% 
   filter(continent != "Asia") %>% 
   group_by(country) %>% 
@@ -80,10 +82,12 @@ data2 <- data %>%
   arrange(max_pop) # <------------- ADD THIS ------------------
 # now, data2 is arranged by increasing maximum population size
 
-data %>%
+# you can also look at the summary stats of a filtered item
+china <- data %>%
   dplyr::filter(country == "China") %>%
   dplyr::summarise(mean_life_exp = mean(life_exp),
                    mean_gdp_percap = mean(gdp_percap))
+
 
 ```
 
@@ -91,6 +95,7 @@ data %>%
 ## 3. Visualizing Summaries
 ### 3.1 Boxplots – geom_boxplot()
 ```{r}
+
 # Show distribution of life expectancy by continent
 ggplot(data, aes(x = continent, y = life_exp, fill = continent)) +
   geom_boxplot() +
@@ -103,11 +108,12 @@ ggplot(data, aes(x = continent, y = life_exp, fill = continent)) +
 ### 3.2 Line plot – geom_line()
 ```{r}
 
+# let's first filter the data to Germany only
 germany <- data %>% 
    dplyr::filter(country == "Germany")
 
 ggplot(germany, aes(x = year, y = life_exp)) +
-  geom_line() +
+  geom_line(color = "red", size = 2.5) +
   labs(title = "Germany Life Expectancy (1952–2007)",
        x = "Year")
 
@@ -117,15 +123,35 @@ ggplot(germany, aes(x = year, y = life_exp)) +
 ### Summarize by continent, year
 ```{r}
 
+# summarizing relevant data
 data3 <- data %>% 
-  group_by(continent, year) %>% 
+  group_by(continent) %>% 
+  summarize(mean_life_exp = mean(life_exp, na.rm = TRUE))
+# but this only gives us a global mean per continent. I want to see change over time...
+
+# View(data3)
+
+
+# so if we add year to the grouping factor, we can create the per-year change for each continent
+data3 <- data %>% 
+  group_by(continent, year) %>% # ADD YEAR!!!!!!!
   summarize(mean_life_exp = mean(life_exp, na.rm = TRUE))
 
 # View(data3)
 
+
+# line plot to show change by continent
 ggplot(data3, aes(x = year, y = mean_life_exp, color = continent)) +
   geom_line() +
-  labs(title = "Life Expectancy by Continent (1952–2007)",
+  labs(title = "Life Expectancy by Continent",
+       x = "Year", y = "Life Expectancy")
+
+
+# faceting by continent
+ggplot(data, aes(x = year, y = life_exp, color = continent, group = country)) +
+  geom_line() +
+  facet_wrap(~continent) + 
+  labs(title = "Life Expectancy per Country",
        x = "Year", y = "Life Expectancy")
 
 ```
