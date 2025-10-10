@@ -2,7 +2,9 @@
 title: "Week 3: Grouping, Summarizing, and Custom Visuals"
 author: "Ronnie Bailey-Steinitz"
 date: "2025-10-06"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 editor_options: 
   chunk_output_type: console
 ---
@@ -11,7 +13,7 @@ editor_options:
 
 This week we introduce only **two new functions** — `group_by()` and `summarise()` —  and then spend most of the time visualizing data.  
 
-We’ll use the **gapminder** dataset, which includes demographic and economic data by country and year.  
+We’ll use the **gapminder** dataset, which contains demographic and economic data from multiple countries between 1952 and 2007. Each row represents a country–year combination.
 
 ## 0. Load Required Packages
 ```{r}
@@ -26,15 +28,20 @@ library(here) # this package will help overcome issues with knitting and your wo
 ## 1. Load Data
 ```{r}
 
+# note the inclusion of the here() command around the file path to help with knitting conflicts
 data <- read_csv(here("Week 3/gapminder.csv")) %>% 
   janitor::clean_names()
 
 glimpse(data)   # quick look at variables
 
 ```
-
+  
+Now that we can filter and select data, we’ll learn how to summarize it by group.
+Think of this as splitting data into smaller pieces (groups), calculating statistics within each, and then combining the results.  
+  
 ## 2. Grouping and Summarizing
 ### 2.1 group_by() + summarise()
+First, let’s look at a single overall mean. Then we’ll use group_by() to see how the mean changes across groups.
 ```{r}
 
 # We can get a summary statistic
@@ -48,7 +55,8 @@ data %>%
   dplyr::summarise(mean_life_exp = mean(life_exp, na.rm = TRUE))
 ### A: We get the mean by group, in this case, continent =====================
 
-# We can summarize after applying a filter and then a grouping command
+
+# We can combine filter() and group_by() in one pipeline to focus on a subset of the data before summarizing.  
 data1 <- data %>% 
   filter(year == 2007) %>% 
   dplyr::group_by(continent) %>%
@@ -59,7 +67,10 @@ write_csv(data1, "Mean Life Expectancy by Continent.csv")
 
 ```
 
+Exporting results with `write_csv()` is useful if you want to save summary tables for later analysis or visualization.  
+
 ### 2.2 Summarize and Arrange
+Let’s practice combining summaries with sorting functions. arrange() helps reorder your results so the patterns are easier to read.  
 ```{r}
 
 data1 <- data %>% 
@@ -112,6 +123,7 @@ ggplot(data, aes(x = continent, y = life_exp, fill = continent)) +
 germany <- data %>% 
    dplyr::filter(country == "Germany")
 
+# Line plots are ideal for showing changes over time within a single country or group.
 ggplot(germany, aes(x = year, y = life_exp)) +
   geom_line(color = "red", size = 2.5) +
   labs(title = "Germany Life Expectancy (1952–2007)",
@@ -119,6 +131,8 @@ ggplot(germany, aes(x = year, y = life_exp)) +
 
 ```
 
+
+Now we’ll combine both grouping variables — continent and year — to visualize regional trends over time.  
 
 ### Summarize by continent, year
 ```{r}
@@ -156,7 +170,7 @@ ggplot(data, aes(x = year, y = life_exp, color = continent, group = country)) +
 
 ```
 
-
+Faceting allows us to create small multiples, e.g., one panel per continent, making it easier to compare trends side by side.
 
 
 # Skills Application – Lab  
