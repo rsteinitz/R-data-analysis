@@ -9,6 +9,10 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE)
+```
+
 # Skills Learning – Lecture  
 
 This week we introduce only **two new functions** — `group_by()` and `summarise()` —  and then spend most of the time visualizing data.  
