@@ -1,0 +1,90 @@
+---
+title: "Week 4 Pre-Lecture Instructions"
+author: "Ronnie Bailey-Steinitz"
+date: "2025-10-16"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Preparing for Week 4
+
+Before we start working with the Week 4 materials, make sure your folder and project are correctly set up.  
+This ensures that all file paths work with the `here()` package and that your code runs smoothly when knitted.
+
+
+## 1. Create a Week 4 Folder
+
+Inside your main project directory - **`R-ecology-workshop`** - create a new folder called **`Week 4`**.  
+
+Your directory should now look like this:
+
+R-ecology-workshop/  
+  |  
+  ___ Week 1/  
+  |  
+  ___ Week 2/  
+  |  
+  ___ Week 3/  
+  |  
+  ___ Week 4/ *<- move downloaded files into here*  
+
+> *Important:* Move your downloaded files **directly into this Week 4 folder** -  
+> do **not** leave them inside a nested “Downloads” or “Week 4” subfolder.
+
+  
+## 2. Download the Week 4 Materials
+
+All Week 4 files are available in the shared \href{https://drive.google.com/drive/folders/...}{\textcolor{blue}{*Google Drive Week 4 folder*}}.
+
+
+Download and save the following **five files** into your new **`R-ecology-workshop/Week 4/`** folder:
+
+- `climate.csv`  
+- `forest_area.csv`  
+- `country_area.csv`  
+- `countries_continents.csv`  
+- `Week 4 Joining and Reshaping BLANK.Rmd` *(blank file to get you started)*
+
+
+## 3. Open Your Project and File
+
+1. In RStudio, open your main project: **`R-ecology-workshop.Rproj`**
+2. In the *Files* pane, navigate to your new **Week 4** folder.  
+3. Open the file **`Week 4 Joining and Reshaping BLANK.Rmd`** - this is where we’ll work today.
+
+
+## 4. Load the Week 4 Datasets
+
+Once each dataset has been placed inside your Week 4 folder, load them with:
+```{r, warning=FALSE, eval=FALSE}
+
+library(tidyverse)
+library(here)
+library(janitor)
+
+climate <- read_csv(here("Week 4/climate.csv")) %>% janitor::clean_names()
+forest <- read_csv(here("Week 4/forest_area.csv")) %>% janitor::clean_names()
+area <- read_csv(here("Week 4/country_area.csv")) %>% janitor::clean_names()
+cont <- read_csv(here("Week 4/countries_continents.csv")) %>% janitor::clean_names()
+
+```
+
+## About the datasets
+- `climate.csv` - Annual mean temperature per country (long format).
+- `forest_area.csv` - Forested area per country by year (wide format; columns are years).
+- `country_area.csv` - Static total land area (km²) per country (two columns).
+- `countries_continents.csv` - Lookup table linking each country to its continent.
+
+Once everything is loaded, we are ready to start joining the datasets together!
+
+
+## Important! **Knitting to PDF**
+If you've had issues with knitting to PDF, try running the following two commands in your console: 
+```{r, eval=FALSE}
+install.packages("tinytex")
+tinytex::install_tinytex()
+```
+... one line at a time. The second line (`install_tinytex()`) will take some time ( approx. 30-60 minutes! depending on the internet connection), so be patient and let it finish installing.

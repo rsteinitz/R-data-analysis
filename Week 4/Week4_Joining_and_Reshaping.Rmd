@@ -1,0 +1,267 @@
+---
+title: "Week 4 – Joining and Reshaping Data"
+author: "Ronnie Bailey-Steinitz"
+date: "2025-10-20"
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(scipen = 999)
+```
+
+
+# Skills Learning – Lecture
+
+This week we’ll combine several global datasets to explore **how forest cover and biomass change over time**, and how these trends relate to **climate**.
+
+We’ll use four datasets:
+
+1. **`climate.csv`** – Annual mean temperature per country (*long format*).  
+2. **`forest_area.csv`** – Forested area by country and year (*wide format*).  
+3. **`forest_biomass.csv`** – Total forest biomass per country and selected years (*long format*).  
+4. **`country_area.csv`** – Each country’s total land area (*static, two columns*).
+
+---
+
+## 0. Load Required Packages
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+---
+
+## 1. Load the Data
+```{r}
+# Load each dataset
+climate <- read_csv(here("Week 4/climate.csv")) %>% 
+  janitor::clean_names()
+
+forest <- read_csv(here("Week 4/forest_area.csv")) %>% 
+  janitor::clean_names()
+
+area <- read_csv(here("Week 4/country_area.csv")) %>% 
+  janitor::clean_names()
+
+cont <- read_csv(here("Week 4/countries_continents.csv")) %>% 
+  janitor::clean_names()
+
+# Peek at structure
+head(climate)
+head(forest)
+head(area)
+head(cont)
+
+```
+
+When R reads column names that **start with a number** (like `1990`), it automatically adds an **“x”** (→ `x1990`) so that the name starts with a letter.  
+That’s fine for now — we’ll remove the `x` when we reshape to long format.  
+
+
+## 2. Reshape (Wide → Long)
+Each year is currently stored in its own column, which makes the dataset **wide**.  
+To analyze trends over time, we need each **country–year** pair as a separate row — this is the **long** (tidy) format.
+```{r}
+
+# Try plotting these three columns in wide format
+ggplot(forest, aes(x = country, y = x1990)) +
+  geom_point()
+
+# so, we convert it into wide format:
+forest_long <- forest %>%
+  pivot_longer(
+    cols = -country, #select all columns except country; all years
+    names_to  = "year", # create new column named 'year' that include all years
+    values_to = "forest_area") #create new column named 'forest_area' with area values from year columns
+
+# BUT! the years are stored as *text* with the 'x' character before the number.
+# we need to remove each x, and convert this variable to numeric!
+
+forest_long <- forest %>%
+  pivot_longer(
+    cols = -country, 
+    names_to  = "year", 
+    values_to = "forest_area" 
+  ) %>%
+  mutate(year = as.numeric(str_replace(year, "^x", ""))) # remove 'x' from the start of each year name and convert to numeric
+
+head(forest) # wide format
+head(forest_long) # long format
+
+```
+
+## 3. Join the Datasets
+We’ll combine all four datasets using **`left_join()`**, keeping all countries/years that appear in `forest_long`.
+```{r}
+
+# join forest data with climate data (also matched by country and year)
+forest_clim <- left_join(forest_long, climate, by = c("country", "year"))
+
+# join static country area data (matched only by country)
+joined <- left_join(forest_clim, area, by = "country")
+
+
+glimpse(joined)
+
+
+joined <- forest_long %>% 
+  left_join(climate, by = c("country", "year")) %>% 
+  left_join(area, by = "country") 
+
+```
+
+
+## 4. Create New Variables
+Now we can calculate **percent forest cover** — the proportion of each country’s total area covered by forest.  
+We’ll also standardize biomass to millions of tons for easier plotting.
+```{r}
+
+joined <- joined %>%
+  mutate(
+    percent_forest = (forest_area / area_sqkm) * 100
+  )
+
+joined_cont <- joined %>% 
+  left_join(cont, by = "country")
+
+```
+
+
+## 5. Explore and Visualize
+### 5.1 Forest Cover Through Time
+```{r}
+
+ggplot(joined_cont, aes(x = year)) +
+  geom_line(aes(y = percent_forest, color = country)) +
+  facet_wrap(~continent, scales = "free_y") +
+  theme(legend.position = "none")
+
+# add labels
+ggplot(joined_cont, aes(x = year)) +
+  geom_line(aes(y = percent_forest, color = country)) +
+  facet_wrap(~continent, scales = "free_y") +
+  labs(title = "Forest Cover Over Time",
+       x = "Year", y = "Value", color = "Variable") +
+  theme(legend.position = "none")
+
+#notice the "Warning Message: Removed 240 rows containing missing values"
+
+# this is OK!! It just means it removed rows where one of the variables was NA, because it cannot plot that row.
+
+ggplot(joined_cont %>% filter(continent == "Asia"), aes(x = year)) +
+  geom_line(aes(y = percent_forest, color = country))
+
+
+```
+
+
+### 5.2 Forest Cover vs. Temperature
+```{r}
+
+# Summarize to one value per country
+country_summary <- joined_cont %>%
+  group_by(country, continent) %>%
+  summarise(
+    mean_temp = mean(annual_mean, na.rm = TRUE),
+    mean_forest = mean(percent_forest, na.rm = TRUE)
+  )
+
+# Plot mean temperature vs mean forest cover
+ggplot(country_summary, 
+       aes(x = mean_temp, 
+           y = mean_forest, 
+           color = continent)) +
+  geom_point()
+# +
+#   geom_smooth(method = "lm", se = F)
+
+
+ggplot(country_summary, aes(x = mean_temp, y = mean_forest, color = continent)) +
+  geom_point() +
+  labs(title = "Average Forest Cover vs. Mean Annual Temperature (by Country)",
+       x = "Mean Annual Temperature (°C)",
+       y = "Mean % Forested Area") +
+  theme_minimal()
+
+
+```
+
+---
+
+
+# Skills Application – Practice Prompts
+
+Try the following short exercises using either your **own dataset** or the **Week 4 example datasets**: in `R Course Materials for Students > Sample data`
+- gapminder > avg_daily_income: Mean daily household per capita income (inflation-adjusted)  
+
+- gapminder > literacy_rates: Adult literacy rates is the percentage of people aged 15 and above who can read and write short, simple statements  
+
+```{r}
+
+income <- read_csv(here("Sample datasets/avg_daily_income.csv")) 
+
+literacy <- read_csv(here("Sample datasets/literacy_rates.csv")) 
+
+```
+
+
+
+Use either the **Week 4 example datasets** or the optional **Gapminder income and literacy datasets** provided in the shared folder.  
+These exercises combine ideas from **Week 3 (grouping & summarizing)** and **Week 4 (joining & reshaping)** — but push them one step further.  
+
+
+1. **Join on a different key variable:**  
+   The `climate` dataset includes a **country code** column.  
+   Try joining the **`forest_long`** dataset with `climate` using the code variable (`code`) instead of `country`. What happens? How do the number of matched rows differ from joining by `country`?  
+
+
+2. **Compare data completeness:**  
+   Use `anti_join()` to find which countries are present in the `forest_long` dataset but missing from `climate`, and vice versa. How many unique countries appear in only one of the two datasets?  
+
+
+3. **Calculate a new summary statistic:**  
+   Instead of the mean, compute the **standard deviation** or **range** of percent forest cover across all available years for each country. Which countries show the largest year-to-year variation in forest cover?  
+
+
+4. **Bring in a new dataset:**  
+   Reshape the `literacy_rates` dataset to long format and join it with the `forest_long` dataset (by `country` and `year`). Explore whether literacy rates appear to increase or decrease with forest cover using a scatter plot or correlation.  
+
+
+5. **Challenge (multi-join synthesis):**  
+   Combine data from `forest_long`, `income`, and `cont` (continent info) to compare regions. Group by `continent` and compute the **average income** and **average percent forest cover** for the most recent year available in both datasets. Which continents have the highest and lowest values?
+
+> Tip: Save each summarized dataset or plot as its own R object so you can reuse them later.
+
+
+---
+
+
+# Key Takeaways
+
+- R adds `"x"` prefixes to numeric column names — we can remove them with `str_replace()`.  
+- `pivot_longer()` transforms wide data into tidy long format.  
+- `left_join()` merges datasets by shared keys (`country`, `year`).  
+- Derived variables such as **% forest cover** help compare across space and time.  
+- Combining multiple environmental datasets reveals relationships among **climate**, **forest area**, and **biomass**.
+
+---
+
+## Data Sources
+
+The datasets used in this week’s lesson come from open global repositories maintained by the World Bank and other organizations that compile long-term environmental data.
+
+- **Climate (Temperature) Data:**  
+  Downloaded from [Kaggle: *Mean Temperature for Countries by Year (2014–2022)*](https://www.kaggle.com/datasets/palinatx/mean-temperature-for-countries-by-year-2014-2022?resource=download).  
+  This dataset compiles annual mean temperature values for all available countries between 1901 and 2022.
+
+- **Forest Area, Forest Biomass, and Country Area:**  
+  Obtained from [Gapminder](https://www.gapminder.org/data/), which aggregates and cleans data originally published by the [World Bank](https://www.worldbank.org/ext/en/home).  
+  These datasets provide estimates of total land area, forested area (in km²), and above-ground forest biomass (in metric tons) for countries worldwide.
+
+All data are provided under open-access terms for educational and research use.
