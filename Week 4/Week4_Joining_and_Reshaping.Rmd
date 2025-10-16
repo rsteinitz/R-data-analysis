@@ -35,8 +35,6 @@ library(here)
 library(janitor)
 ```
 
----
-
 ## 1. Load the Data
 ```{r}
 # Load each dataset
@@ -69,18 +67,42 @@ Each year is currently stored in its own column, which makes the dataset **wide*
 To analyze trends over time, we need each **country–year** pair as a separate row — this is the **long** (tidy) format.
 ```{r}
 
+# now, we want to the datasets. 
+
 # Try plotting these three columns in wide format
 ggplot(forest, aes(x = country, y = x1990)) +
   geom_point()
 
+```
+
+The wide format version of the forest dataset looks neat at first glance: **each year is its own column**, but this structure causes major problems when we try to analyze or visualize it.  
+
+Each column represents a year (e.g., `x1990`, `x1991`, `x1992`), so the information about when each value was recorded is stored in the column names instead of in a proper variable.  
+
+> This means that R (and ggplot2, dplyr, etc.) cannot easily recognize “year” as a variable we can filter, group, or plot along an axis.  
+
+To make a simple time-series plot, we would need to manually reference each year column, which quickly becomes impossible when there are dozens of years.  
+
+```{r}
 # so, we convert it into wide format:
 forest_long <- forest %>%
   pivot_longer(
-    cols = -country, #select all columns except country; all years
+    cols = -country, #select all years: all columns except country;
     names_to  = "year", # create new column named 'year' that include all years
     values_to = "forest_area") #create new column named 'forest_area' with area values from year columns
 
-# BUT! the years are stored as *text* with the 'x' character before the number.
+head(forest_long)
+```
+
+By reshaping the data to long format, we store year as a real variable and forest_area as a single value column.  
+
+Now each row represents one observation (a country–year pair), which is what R expects for most analyses.  
+
+```{r}
+
+head(forest_long) # BUT! the years are stored as *text* with the 'x' character before the number.
+class(forest_long$year) # character
+
 # we need to remove each x, and convert this variable to numeric!
 
 forest_long <- forest %>%
@@ -127,6 +149,7 @@ joined <- joined %>%
     percent_forest = (forest_area / area_sqkm) * 100
   )
 
+# and say I wanted to also know the continent each country-year observation
 joined_cont <- joined %>% 
   left_join(cont, by = "country")
 
@@ -137,9 +160,15 @@ joined_cont <- joined %>%
 ### 5.1 Forest Cover Through Time
 ```{r}
 
+# first, let's plot change in percent cover over time by country
 ggplot(joined_cont, aes(x = year)) +
   geom_line(aes(y = percent_forest, color = country)) +
-  facet_wrap(~continent, scales = "free_y") +
+  theme(legend.position = "none")
+
+# ok, a bit too busy. Let's subdivide the plot by continent
+ggplot(joined_cont, aes(x = year)) +
+  geom_line(aes(y = percent_forest, color = country)) +
+  facet_wrap(~continent, scales = "free_y") + # <--- ADD THIS
   theme(legend.position = "none")
 
 # add labels
@@ -147,13 +176,14 @@ ggplot(joined_cont, aes(x = year)) +
   geom_line(aes(y = percent_forest, color = country)) +
   facet_wrap(~continent, scales = "free_y") +
   labs(title = "Forest Cover Over Time",
-       x = "Year", y = "Value", color = "Variable") +
+       x = "Year", y = "Percent Forest Cover", color = "Country") + # <--- ADD THIS
   theme(legend.position = "none")
 
 #notice the "Warning Message: Removed 240 rows containing missing values"
 
 # this is OK!! It just means it removed rows where one of the variables was NA, because it cannot plot that row.
 
+# You can also just limit it to one continent now
 ggplot(joined_cont %>% filter(continent == "Asia"), aes(x = year)) +
   geom_line(aes(y = percent_forest, color = country))
 
@@ -178,13 +208,20 @@ ggplot(country_summary,
            y = mean_forest, 
            color = continent)) +
   geom_point()
-# +
-#   geom_smooth(method = "lm", se = F)
 
-
-ggplot(country_summary, aes(x = mean_temp, y = mean_forest, color = continent)) +
+# add labels
+ggplot(data = country_summary, aes(x = mean_temp, y = mean_forest, color = continent)) +
   geom_point() +
-  labs(title = "Average Forest Cover vs. Mean Annual Temperature (by Country)",
+  labs(title = "Forest Cover vs. Mean Annual Temperature",
+       x = "Mean Annual Temperature (°C)",
+       y = "Mean % Forested Area") +
+  theme_minimal()
+
+# you can also use the internal use of ggplot geoms to highlight particular data points, using a filter!
+ggplot() +
+  geom_point(data = country_summary %>% filter(mean_forest > 75), aes(x = mean_temp, y = mean_forest), size = 4, color = "darkgreen") +
+  geom_point(data = country_summary, aes(x = mean_temp, y = mean_forest, color = continent)) +
+  labs(title = "Forest Cover vs. Mean Annual Temperature",
        x = "Mean Annual Temperature (°C)",
        y = "Mean % Forested Area") +
   theme_minimal()
