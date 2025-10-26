@@ -1,0 +1,245 @@
+---
+title: "Week 5 Skew and Transformations"
+author: "Ronnie Bailey-Steinitz"
+date: "2025-10-21"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Skills Learning – Lecture
+
+This week we introduce two new functions:  
+- `log()`  
+- `scale()`  
+
+
+We will use them to explore different types of distributions (normal vs. skewed), understand why we sometimes need to transform data, and visualize how transformations can make relationships easier to interpret.
+
+Sample Data: Pima Indians Diabetes Database - [Kaggle](https://www.kaggle.com/datasets/mathchi/diabetes-data-set/data); Original owners: National Institute of Diabetes and Digestive and Kidney Diseases.  
+
+Each row represents an individual woman, with the following info:  
+- **Pregnancies**: Number of times pregnant  
+- **Glucose**: Plasma glucose concentration a 2 hours in an oral glucose tolerance test  
+- **BloodPressure**: Diastolic blood pressure (mm Hg)  
+- **SkinThickness**: Triceps skin fold thickness (mm)  
+- **Insulin**: 2-Hour serum insulin (mu U/ml)  
+- **BMI**: Body mass index (weight in kg/(height in m)^2)  
+- **DiabetesPedigreeFunction**: Diabetes pedigree function  
+- **Age**: Age (years)  
+- **Outcome**: Class variable (0 or 1)  
+
+# 0. Load Packages
+```{r}
+
+library(tidyverse)
+library(janitor)
+library(here)
+
+```
+
+
+# 1. Import Data
+```{r}
+
+data <- read_csv(here("Week 5/diabetes.csv")) %>% 
+  janitor::clean_names()
+
+dplyr::glimpse(data)
+
+```
+
+
+# 2. What Does “Skew” Mean?
+
+Distributions can be:  
+- Normal (bell-shaped, symmetric)  
+- Positively skewed (tail on the right)  
+- Negatively skewed (tail on the left)  
+
+Let’s visualize the distributions of our variables using a density plot.  
+A **density plot** is a *smoothed*, continuous version of a histogram that shows the distribution of a numeric variable. It uses a method called *kernel density estimation** to plot the probability density function, helping to **reveal the shape of the data distribution* more clearly than a histogram.
+```{r}
+
+# Easiest and quickest way to look at data distribution
+hist(data$glucose, 20)
+hist(data$insulin, 20)
+
+# You can also choose to make a density plot
+ggplot(data, aes(x = glucose)) +
+  geom_density(fill = "steelblue")
+
+ggplot(data, aes(x = insulin)) +
+  geom_density(fill = "steelblue") # positive skew or right-skewed distribution
+
+```
+
+Notice that:
+- Glucose is fairly normal  
+- Insulin is ***heavily*** right-skewed — lots of small values and a few very large ones  
+
+
+> The main issues with heavily right-skewed data are that it can distort statistical measures like the mean, negatively impact the performance of many statistical models (especially regression), and violate the assumptions of statistical tests that require a normal distribution.  
+
+# When and Why to Transform Data
+We transform data for several reasons:
+- Improve interpretability.
+Some variables make more sense in a different form (e.g., taking the reciprocal or log).  
+
+- Reveal relationships.
+Some relationships look curved, but a transformation makes them linear and easier to model.  
+
+- Meet assumptions for inference.
+Many statistical tests assume normally distributed residuals (errors).  
+
+# 3. Visualize a Releationship
+Let's look at Insulin vs. Glucose
+```{r}
+
+# start with the raw values
+ggplot(data, aes(x = insulin, y = glucose)) + 
+  geom_point(alpha = 0.5) +
+  geom_smooth() +
+  #theme_minimal() +
+  labs(title = "Raw relationship: Glucose vs. Insulin")
+
+```
+
+> The relationship looks noisy and maybe logistic.  
+
+Let’s apply a log transformation to both variables.  
+
+# 4. Transformations
+The log transform helps when variables are right-skewed. It "compresses" large values and spreads out smaller ones.  
+
+## 4.1 log-transform
+```{r}
+
+# so, let's create a new variable with the log-tranformed insulin values:
+data <- data %>% 
+  mutate(log_insulin = log10(insulin))
+
+summary(data$insulin)
+summary(data$log_insulin)
+
+```
+
+
+## 4.2 Plotting relationship
+```{r}
+
+ggplot(data, aes(x = insulin, y = glucose)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(data, aes(x = log_insulin, y = glucose)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(x = "log(Insulin)", y = "Glucose", title = "Relationship between Insulin and Glucose")
+
+```
+
+
+
+# 5. Standardization (Z-scores)
+Sometimes, we don’t just transform — we standardize.  
+The `scale()` function rescales a variable so that:  
+- Mean = 0  
+- Standard deviation = 1  
+
+This is useful when comparing variables with different units. 
+
+```{r}
+
+# Now, I'd like to plot changes in a variable over lifetime
+ggplot(data) +
+  geom_smooth(aes(x = age, y = insulin), color = "green4") +
+  geom_smooth(aes(x = age, y = bmi), color = "tan3")
+
+
+ggplot() +
+  geom_smooth(data_ins, aes(x = age, y = insulin)) +
+  geom_smooth(data_bmi, aes(x = age, y = bmi))
+  
+
+
+ggplot(data, aes(x = age, y = bmi)) +
+  geom_smooth()
+
+data <- data %>%
+  mutate(z_ins = as.numeric(scale(insulin)),
+         z_bmi = as.numeric(scale(bmi)))
+
+ggplot(data) +
+  geom_smooth(aes(x = age, y = z_ins), color = "green4") +
+  geom_smooth(aes(x = age, y = z_bmi), color = "tan3")
+
+ggplot(data) +
+  geom_smooth(aes(x = age, y = z_ins, color = "Insulin"), se = F) +
+  geom_smooth(aes(x = age, y = z_bmi, color = "BMI"), se = F) +
+  scale_color_manual(name = "Type", 
+                     values = c("Insulin" = "green4", "BMI" = "tan3")) +
+  theme_minimal()
+
+
+
+```
+
+
+> Notice that transformations can make patterns clearer, but not always! Choosing the right one depends on your data and your question.  
+
+
+
+---
+
+# Skills Application
+
+Try the following short exercises using either your own dataset or the Week 5 example dataset:
+in R Course Materials for Students > Sample data
+
+`diabetes.csv` – Pima Indians Diabetes dataset from Kaggle
+
+Use either the Week 5 example dataset or your own dataset from a previous week.
+These exercises combine ideas from Week 2 (wrangling), Week 3 (grouping & summarizing), and Week 4 (joining & visualization), while adding this week’s focus on distribution shape and data transformations.
+
+# 1. Spot the skew:  
+Create a long-format dataset containing several numeric variables (e.g., Glucose, BMI, Insulin).  
+- Use `geom_density()` or `geom_histogram()` to visualize the distribution of each.  
+- Which variables look normally distributed, and which are skewed?  
+- In one or two sentences, describe how skew might affect summary statistics or interpretation in your dataset.  
+
+
+# 2. Reveal a hidden relationship:  
+- Pick two numeric variables that appear curved or noisy when plotted together.  
+- Make one scatterplot using the raw values, and another after transforming one variable with `log10()` or z-score.  
+- Compare the two plots — does the relationship become more linear or clearer after transformation?  
+
+
+# 3. Compare summaries before and after transformation:  
+- Choose one skewed variable (e.g., Insulin).  
+- Use `summarise()` to calculate `mean()`, `median()`, and `sd()` before and after applying `log10()` or `scale()`.  
+- Plot both versions using facet_wrap() or two density plots side by side.  
+- How do the mean and median differ? Which transformation better reduces skew?  
+
+
+# 4. Standardization in practice:  
+- Select two variables with different scales (for example, Glucose and BMI).  
+- Create new z-score columns using `scale()` and add them to your dataframe.  
+- Make a scatterplot comparing the z-scores and discuss how standardizing helps when variables are in different units.  
+- What does a value of +1 or -1 standard deviation represent for your variables?  
+
+
+# 5. Bring it all together:
+- Choose any dataset you’ve worked with so far (e.g., from the gapminder or forest_long exercises).  
+- Identify one skewed numeric variable and apply an appropriate transformation.  
+- Use visualizations (geom_density(), geom_smooth()) and summaries to show how interpretability or linearity improves.  
+
+> Tip: Save your transformed data and plots as new R objects. You’ll reuse them later when we begin exploring correlations and model fitting in the next unit.

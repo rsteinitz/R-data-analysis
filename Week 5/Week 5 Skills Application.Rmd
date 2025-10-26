@@ -1,0 +1,55 @@
+---
+title: "Week 5 Skills Application"
+author: "Ronnie Bailey-Steinitz"
+date: "2025-10-24"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Skills Application
+
+Try the following short exercises using either your own dataset or the Week 5 example dataset:
+in R Course Materials for Students > Sample data
+
+`diabetes.csv` – Pima Indians Diabetes dataset from Kaggle
+
+Use either the Week 5 example dataset or your own dataset from a previous week.
+These exercises combine ideas from Week 2 (wrangling), Week 3 (grouping & summarizing), and Week 4 (joining & visualization), while adding this week’s focus on distribution shape and data transformations.
+
+## 1. Spot the skew:  
+Create a long-format dataset containing several numeric variables (e.g., Glucose, BMI, Insulin).  
+- Use `geom_density()` or `geom_histogram()` to visualize the distribution of each.  
+- Which variables look normally distributed, and which are skewed?  
+- In one or two sentences, describe how skew might affect summary statistics or interpretation in your dataset.  
+
+
+## 2. Reveal a hidden relationship:  
+- Pick two numeric variables that appear curved or noisy when plotted together.  
+- Make one scatterplot using the raw values, and another after transforming one variable with `log10()` or z-score.  
+- Compare the two plots — does the relationship become more linear or clearer after transformation?  
+
+
+## 3. Compare summaries before and after transformation:  
+- Choose one skewed variable (e.g., Insulin).  
+- Use `summarise()` to calculate `mean()`, `median()`, and `sd()` before and after applying `log10()` or `scale()`.  
+- Plot both versions using facet_wrap() or two density plots side by side.  
+- How do the mean and median differ? Which transformation better reduces skew?  
+
+
+## 4. Standardization in practice:  
+- Select two variables with different scales (for example, Glucose and BMI).  
+- Create new z-score columns using `scale()` and add them to your dataframe.  
+- Make a scatterplot comparing the z-scores and discuss how standardizing helps when variables are in different units.  
+- What does a value of +1 or -1 standard deviation represent for your variables?  
+
+
+## 5. Bring it all together:
+- Choose any dataset you’ve worked with so far (e.g., from the gapminder or forest_long exercises).  
+- Identify one skewed numeric variable and apply an appropriate transformation.  
+- Use visualizations (geom_density(), geom_smooth()) and summaries to show how interpretability or linearity improves.  
+
+> Tip: Save your transformed data and plots as new R objects. You’ll reuse them later when we begin exploring correlations and model fitting in the next unit.
+
