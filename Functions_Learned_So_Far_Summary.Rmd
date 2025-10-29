@@ -110,8 +110,9 @@ All `ggplot()` plots must have three basic components: `data`, `aes`, and a `geo
 - Checking and diagnosing data types (`class()`, `unique()`, `table()`).  
 - Detecting and summarizing missing data (`is.na()`, `colSums()`, `summary()`).  
 - Converting variables to correct types (`mutate()`, `as.factor()`).  
-- Making basic plots (`hist()`, `ggplot()`, `geom_bar()`, `geom_histogram()`).  
+- Making basic plots (`hist()`, `ggplot()`, `geom_bar()`, `facet_wrap()`, `geom_histogram()`).  
 
+---
 
 # Week 2: Wrangling Basics – Select, Filter, Mutate
 
@@ -163,8 +164,6 @@ All `ggplot()` plots must have three basic components: `data`, `aes`, and a `geo
 - `scale_fill_manual()`  # Manually sets fill colors.  
   Example: `scale_fill_manual(values = c("male" = "blue", "female" = "red"))`.  
 
----
-
 
 ### By the end of Week 2, you should be comfortable with:
 - Using `%>%` pipes to link commands together and write clean, readable code.    
@@ -172,3 +171,137 @@ All `ggplot()` plots must have three basic components: `data`, `aes`, and a `geo
 - Filtering rows with conditions using `filter()`.  
 - Creating new variables with `mutate()` and `case_when()`.  
 - Visualizing subsets of data using `ggplot()` with filters.  
+
+---
+
+# Week 3: Grouping and Summarizing  
+
+## 1. Grouping and Summarizing  
+- `group_by()` # Defines how data should be split into groups before performing summaries.  
+  Example 1: `data %>% group_by(continent)` → creates a grouped tibble by continent.  
+  Example 2: `data %>% group_by(continent, year)` → groups simultaneously by continent and year.  
+
+- `summarize()` / `summarise()` # Reduces each group to summary statistics you specify.  
+  Example: `data %>% summarize(mean_life_exp = mean(life_exp, na.rm = TRUE))`    
+
+- `n()` # Counts the number of rows (observations) in each group.  
+  Example: `data %>% group_by(continent) %>% summarize(n_countries = n())`    
+
+- `arrange()` # Orders rows by one or more variables.  
+  Example 1: `arrange(data, life_exp)` → ascending.  
+  Example 2: `arrange(data, desc(life_exp))` → descending.  
+
+- `write_csv()` # Writes a data frame to a .csv file.  
+  Example: `write_csv(data1, "Mean Life Expectancy by Continent.csv")`  
+
+
+## 2. Combining Operations with Pipes
+
+- `filter()` → `group_by()` → `summarize()` # Common workflow: filter your data, group it, then summarize.  
+  Example: `data %>% filter(year == 2007) %>% group_by(continent) %>% summarize(mean_life_exp = mean(life_exp, na.rm = TRUE), n_countries = n())`
+  
+
+## 3. Visualizing Summaries  
+
+- `geom_col()` # Creates a bar plot using pre-computed values (like group means).  
+  Example: `ggplot(data1, aes(x = continent, y = mean_life_exp)) + geom_col()`    
+
+- `geom_boxplot()` # Shows the distribution of a numeric variable across groups.  
+  Example: `ggplot(data, aes(x = continent, y = life_exp)) + geom_boxplot()`   
+
+- `geom_line()` # Connects data points by group to show change over time.  
+  Example: `ggplot(data3, aes(x = year, y = mean_life_exp, color = continent)) + geom_line()`  
+  
+
+### By the end of Week 3, you should be comfortable with:   
+- Grouping data using `group_by()` and computing summaries with `summarize()`.  
+- Counting observations with `n()` and ordering results using `arrange()`.  
+- Using pipes to link filtering, grouping, and summarizing steps cleanly.  
+- Exporting summarized tables using `write_csv()`.  
+- Visualizing summarized data with `geom_col()`, `geom_boxplot()`, and `geom_line()`.  
+  
+---
+
+# Week 4: Joining and Reshaping
+
+## 1. Reshaping Data
+
+- `pivot_longer()`  # Converts data from *wide* to *long* format (columns → rows).  
+  Example: `forest_long <- forest %>% pivot_longer(cols = -country, names_to = "year", values_to = "forest_area")`
+
+- `pivot_wider()` # Converts data from long back to wide format (rows → columns).
+Example: `data_wide <- data_long %>% pivot_wider(names_from = year, values_from = forest_area)`
+
+- `str_replace()` # Replaces patterns in text using regular expressions.
+Example: `mutate(year = as.numeric(str_replace(year, "^x", "")))`
+Removes the “x” from year names (e.g., "x1990" → "1990") and converts to numeric.
+
+
+## 2. Joining Datasets
+
+- `left_join()`  # Combines two datasets, keeping all rows from the *left* (first) dataset.  
+  Example: `forest_clim <- left_join(forest_long, climate, by = c("country", "year"))`
+  Merges forest area and climate data using shared columns (`country` and `year`).  
+
+- `inner_join()`  # Keeps only rows that appear in both datasets.  
+  Example: `overlap <- inner_join(forest_long, climate, by = c("country", "year"))`  
+  Useful when you only want complete overlap (no missing data across sources).  
+
+- `anti_join()`  # Returns rows in the first dataset with *no match* in the second.  
+  Example: `missing <- anti_join(forest_long, climate, by = "country")`  
+  Helps identify missing countries or mismatched names before joining.  
+
+
+## 3. Summarizing and Visualizing Joined Data
+
+- `group_by()` + `summarize()`  # Collapse data into group-level summaries.  
+  Example: `country_summary <- joined_cont %>% group_by(country, continent) %>% summarize(mean_temp = mean(annual_mean, na.rm = TRUE), mean_forest = mean(percent_forest, na.rm = TRUE))`  
+  Summarizes data by country and continent to calculate mean temperature and mean forest cover.  
+
+- `geom_point()`  # Plots relationships between two numeric variables.  
+  Example: `ggplot(country_summary, aes(x = mean_temp, y = mean_forest, color = continent)) + geom_point()`  
+  Used here to visualize the relationship between mean annual temperature and mean percent forest cover by country.  
+  
+
+### By the end of Week 4, you should be comfortable with:
+- Reshaping wide data into long format using `pivot_longer()` (and back using `pivot_wider()` if needed).  
+- Cleaning text-based variables using `str_replace()` and converting them to numeric.  
+- Joining multiple datasets using `left_join()`.  
+- Creating derived variables (like **percent forest cover**) with `mutate()`.  
+- Summarizing and visualizing joined datasets using `group_by()`, `summarize()`, and `geom_point()`.  
+
+
+  ---
+  
+  
+
+# Week 5: Skews and Transformations
+
+## 1. Transforming Data
+
+`log()` or `log10()` # Applies a logarithmic transformation to reduce strong right-skew or compress large values.  
+  Example: `mutate(log_insulin = log10(insulin))` → transforms insulin values
+  Example: `mutate(log_insulin = log10(insulin + 1))` → log10(0) produces `NA`, so add `+ 1` to the equation to keep every zero (0) observation as a zero in the dataset. 
+
+`sqrt()` # Applies a square root transformation to reduce moderate right-skew.  
+  Example: `mutate(sqrt_bmi = sqrt(BMI))`  
+
+`scale()` # Standardizes numeric variables to z-scores (mean = 0, SD = 1).  
+  Example: `mutate(z_glucose = as.numeric(scale(glucose)))` → compares variables measured in different units.  
+
+## 2. Exploring Distribution Shape
+
+`geom_density()` # Creates a smooth curve showing the distribution of a numeric variable.  
+  Example: `ggplot(data, aes(x = insulin)) + geom_density(fill = "steelblue", alpha = 0.6)`    
+
+`geom_smooth(method = "lm")` # Adds a linear regression trend line to a scatterplot.  
+  Example: `geom_smooth(method = "lm", se = FALSE)` → shows whether the relationship between variables is linear. `se = FALSE` removes the grey standard error ribbon around the regression line.  
+
+
+### By the end of Week 5, you should be comfortable with:  
+
+- Recognizing skewed vs. normal distributions using density plots.  
+- Applying transformations (log(), sqrt(), scale()) to make data more interpretable or meet model assumptions.  
+- Comparing raw and transformed variables visually using scatterplots and trend lines.  
+
+  
