@@ -1,0 +1,154 @@
+---
+title: "Week 6: Relationships – Regression and Correlation"
+author: "Ronnie Bailey-Steinitz"
+date: "2025-11-03"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Skills Learning – Lecture  
+
+This week, we will explore **relationships between variables** using **correlation** and **linear regression**.  
+You’ll learn to fit and interpret a simple linear model in R using the `lm()` function, visualize fitted trend lines with `geom_smooth(method = "lm")`, and compute correlation coefficients with `cor()`.
+
+We’ll use the **Palmer Penguins (raw)** dataset — a classic ecology dataset with measurements of penguin morphology, isotopes, and breeding information.
+
+
+## 0. Load Packages
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+
+```
+
+---
+
+## 1. Import and Clean Data
+```{r}
+data <- read_csv(here("Week 1/Palmer Penguins Raw.csv")) %>%
+  janitor::clean_names()
+
+dplyr::glimpse(data)
+
+options(scipen = 999) 
+```
+
+For today’s examples, we’ll focus on **bill length** and **flipper length**, two continuous variables that often show strong positive relationships in penguins.
+
+
+## 2. Visualizing Relationships
+ 
+```{r}
+
+
+```
+
+
+
+## 3. Fitting a Linear Model with `lm()`
+
+```{r}
+
+
+
+```
+
+
+### Interpreting Model Output  
+- **Call:** shows the fitted model; flipper length predicted from bill length.
+- **Intercept:** predicted flipper length when `bill = 0`, not meaningful biologically.
+- **Slope:** each `1 mm` increase in bill length leads to about `1.69 mm` increase in flipper length.
+- **Standard Error:** measures estimate precision; smaller means more reliable.
+- **t value:** tests if coefficient differs from zero; larger values indicate stronger effects.
+- **p value:** probability the effect is due to chance; small values (<0.05) mean significant.
+- **Significance codes:** `***` p < 0.001, `**` p < 0.01, `*` p < 0.05.
+- **Residuals:** differences between observed and predicted values; show model error.
+- **RSE:** average prediction error = 10.63 mm; smaller values mean better fit.
+- **Degrees of freedom:** 340 = n - 2; shows data points used to estimate error.
+- **R squared:** `0.43`, meaning 43 percent of variation explained by bill length.
+- **Adjusted R squared:** `0.43` after correcting for sample size; same because only one predictor.
+- **F statistic:** `257.1` with `p < 0.001`; model explains variance significantly.
+
+> Results: Longer bills go with longer flippers; strong, positive, significant relationship.  
+
+
+--- 
+
+### You can access specific components of the model like this:  
+```{r}
+
+
+
+```
+
+
+## 4. Correlation Between Two Variables
+
+```{r}
+
+
+```
+
+
+
+## 5. Visualizing Relationships by Group
+
+```{r}
+
+
+
+```
+
+
+## 6. Customizing Your Visualization
+
+```{r}
+
+
+```
+
+
+You can find additional color palettes here:   https://r-graph-gallery.com/38-rcolorbrewers-palettes.html)  
+
+
+
+---
+
+# Skills Application – Practice Prompts
+
+Try the following short exercises using the **Palmer Penguins Raw** dataset:
+
+1. **Fit your own model:**  
+   - Choose two new numeric variables.  
+   - Fit a linear model using `lm()` and inspect the output with `summary()`.  
+   - What do the slope and R² tell you about the relationship?
+
+2. **Check correlation:**  
+   - Use `cor()` to calculate the correlation between the same two variables.  
+   - How does it compare to the R² from your model?
+
+3. **Visualize grouped relationships:**  
+   - Make a scatterplot using `geom_point()` + `geom_smooth(method = "lm")`.  
+   - Add a grouping variable inside your `aes()` call (e.g., `aes(color = species)`).  
+   - How do the slopes differ among the groups?
+
+4. **Interpret your model:**  
+   - In one or two sentences, describe what your regression model suggests.  
+   - Are the relationships positive or negative? Strong or weak?
+
+5. **Challenge:**  
+   - Fit a model predicting `body_mass_g` from two predictors (e.g., `flipper_length_mm` and `bill_length_mm`).  
+   - Compare the R² from this two-variable model to the one-variable version. What improved?
+
+---
+
+### By the end of Week 6, you should be able to:
+- Fit and interpret a simple linear regression with `lm()`.
+- Understand key parts of a regression summary (slope, intercept, R², p-value).
+- Calculate correlations with `cor()`.
+- Visualize relationships and add regression lines with `geom_smooth(method = "lm")`.
+- Customize scatterplots with grouping colors and improved labeling.
