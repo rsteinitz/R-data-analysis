@@ -304,4 +304,67 @@ Removes the “x” from year names (e.g., "x1990" → "1990") and converts to n
 - Applying transformations (log(), sqrt(), scale()) to make data more interpretable or meet model assumptions.  
 - Comparing raw and transformed variables visually using scatterplots and trend lines.  
 
+
+
+# Week 6: Relationships – Regression and Correlation
+
+## 1. Modeling and Correlation
+
+- `lm()`  # Fits a linear regression model (estimates intercept and slope).  
+  Example: `lm(flipper_length_mm ~ bill_length_mm, data = my_data)` → models flipper length as a function of bill length.  
+
+- `summary()` (for models)  # Summarizes model output, including coefficients, R², and p-values.  
+  Example: `summary(model)` → prints regression table and model statistics.  
+
+- `cor()`  # Computes correlation between two numeric variables.  
+  Example: `cor(bill_length_mm, flipper_length_mm, use = "complete.obs")` → returns the Pearson correlation coefficient.  
+
+## 2. Accessing Model Components
+
+- `summary(model)$r.squared`  # Retrieves the R² value from the model summary.
+
+## 3. Visualization and Annotation
+
+- `geom_smooth(method = "lm")`  # Adds a fitted regression line to a plot.  
+
+### By the end of Week 6, you should be comfortable with:
+
+- Fitting and summarizing linear models using `lm()` and `summary()`.  
+- Calculating and interpreting correlation with `cor()`.  
+- Accessing model components directly with `$` and `summary(model)$r.squared`.  
+- Adding regression lines using `geom_smooth(method = "lm")`.
+
+
+
+# Week 7: Comparing Groups – Boxplots & Statistical Tests
+
+## 1. Statistical Tests
+
+- `t.test()`  # Performs a two-sample or paired t-test to compare group means.  
+  Example: `t.test(body_mass_g ~ species, data = penguins)` → compares mean body mass between two species.  
+
+- `wilcox.test()`  # Performs a nonparametric Wilcoxon rank-sum or signed-rank test.  
+  Example: `wilcox.test(body_mass_g ~ species, data = penguins)` → compares medians when normality is violated.  
+
+- `aov()`  # Fits a one-way ANOVA model to test for mean differences across three or more groups.  
+  Example: `aov(body_mass_g ~ species, data = penguins)`  
+
+- `TukeyHSD()`  # Conducts post-hoc pairwise comparisons after a significant ANOVA.  
+  Example: `TukeyHSD(model1)` → identifies which species pairs differ significantly.  
+
+- `var.test()`  # Tests whether two samples have equal variances.  
+  Example: `var.test(body_mass_g ~ species, data = penguins)`  
+
+## 2. Visual Diagnostics
+
+- `stat_qq()`  # Adds a Q–Q plot layer showing data quantiles vs. theoretical normal quantiles.  
+  Example: `ggplot(penguins, aes(sample = body_mass_g)) + stat_qq()`  
+
+
+### By the end of Week 7, you should be comfortable with:
+- Performing t-tests, Wilcoxon tests, and ANOVA (`t.test()`, `wilcox.test()`, `aov()`).  
+- Running post-hoc analyses with `TukeyHSD()`.  
+- Checking assumptions with Q–Q plots (`stat_qq()`, `stat_qq_line()`) and variance tests (`var.test()`).  
+- Using boxplots to visualize group differences and interpret potential mean or median shifts.  
+
   
